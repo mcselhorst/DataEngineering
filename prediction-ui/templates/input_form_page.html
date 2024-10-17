@@ -1,0 +1,79 @@
+<html>
+<head>
+    <title>Heart Disease Check Form</title>
+</head>
+<body>
+
+<form action="/checkheartdisease" method="POST">
+    <h1>Check My Heart Health</h1>
+
+    <label for="age">Age (years):</label>
+    <input type="text" id="age" name="age" placeholder="age"> <br>
+
+    <label for="sex">Sex:</label>
+    <select id="sex" name="sex">
+        <option value="1">Male</option>
+        <option value="0">Female</option>
+    </select> <br>
+
+    <label for="cp">Chest Pain Type (cp):</label>
+    <select id="cp" name="cp">
+        <option value="0">Typical Angina</option>
+        <option value="1">Atypical Angina</option>
+        <option value="2">Non-anginal Pain</option>
+        <option value="3">Asymptomatic</option>
+    </select> <br>
+
+    <label for="trestbps">Resting Blood Pressure (trestbps):</label>
+    <input type="text" id="trestbps" name="trestbps" placeholder="trestbps"> <br>
+
+    <label for="chol">Serum Cholesterol (chol mg/dl):</label>
+    <input type="text" id="chol" name="chol" placeholder="chol"> <br>
+
+    <label for="fbs">Fasting Blood Sugar > 120 mg/dl (fbs):</label>
+    <select id="fbs" name="fbs">
+        <option value="1">True</option>
+        <option value="0">False</option>
+    </select> <br>
+
+    <label for="restecg">Resting ECG (restecg):</label>
+    <select id="restecg" name="restecg">
+        <option value="0">Normal</option>
+        <option value="1">Having ST-T wave abnormality</option>
+        <option value="2">Showing probable or definite left ventricular hypertrophy</option>
+    </select> <br>
+
+    <label for="thalach">Maximum Heart Rate Achieved (thalach):</label>
+    <input type="text" id="thalach" name="thalach" placeholder="thalach"> <br>
+
+    <label for="exang">Exercise-Induced Angina (exang):</label>
+    <select id="exang" name="exang">
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+    </select> <br>
+
+    <label for="oldpeak">ST Depression Induced by Exercise (oldpeak):</label>
+    <input type="text" id="oldpeak" name="oldpeak" placeholder="oldpeak"> <br>
+
+    <label for="slope">Slope of Peak Exercise ST Segment (slope):</label>
+    <select id="slope" name="slope">
+        <option value="0">Upsloping</option>
+        <option value="1">Flat</option>
+        <option value="2">Downsloping</option>
+    </select> <br>
+
+    <label for="ca">Number of Major Vessels (ca):</label>
+    <input type="text" id="ca" name="ca" placeholder="ca"> <br>
+
+    <label for="thal">Thalassemia (thal):</label>
+    <select id="thal" name="thal">
+        <option value="1">Normal</option>
+        <option value="2">Fixed Defect</option>
+        <option value="3">Reversible Defect</option>
+    </select> <br>
+
+    <p><input type="submit" value="Check"/></p>
+</form>
+
+</body>
+</html>
