@@ -21,25 +21,29 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px;
-            margin-top: 260px;
+            max-width: 700px;
+            margin-top: 100px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
 
         h1 {
             text-align: center;
             color: #333;
+            grid-column: span 2; /* Make the title span both columns */
         }
 
         label {
-            display: block;
-            margin-top: 10px;
             color: #333;
             font-weight: bold;
+            margin-top: 10px;
+            text-align: right;
         }
 
         input[type="text"],
         select {
-            width: 100%;
+            width: 90%; /* Adjust width for better alignment */
             padding: 10px;
             margin-top: 5px;
             border-radius: 4px;
@@ -48,7 +52,7 @@
         }
 
         input[type="submit"] {
-            width: 100%;
+            grid-column: span 2; /* Make the submit button span both columns */
             padding: 12px;
             background-color: #28a745;
             color: white;
@@ -65,12 +69,14 @@
 
         p {
             text-align: center;
+            grid-column: span 2; /* Center the paragraph across columns */
         }
 
         @media (max-width: 600px) {
             form {
                 padding: 15px;
                 width: 90%;
+                grid-template-columns: 1fr; /* Stack labels and inputs on small screens */
             }
         }
     </style>
@@ -81,13 +87,13 @@
     <h1>Heart Disease Check</h1>
 
     <label for="age">Age (years):</label>
-    <input type="text" id="age" name="age" placeholder="age"> <br>
+    <input type="text" id="age" name="age" placeholder="age"> 
 
     <label for="sex">Sex:</label>
     <select id="sex" name="sex">
         <option value="1">Male</option>
         <option value="0">Female</option>
-    </select> <br>
+    </select> 
 
     <label for="cp">Chest Pain Type:</label>
     <select id="cp" name="cp">
@@ -95,55 +101,55 @@
         <option value="1">Atypical Angina</option>
         <option value="2">Non-anginal Pain</option>
         <option value="3">Asymptomatic</option>
-    </select> <br>
+    </select> 
 
     <label for="trestbps">Resting Blood Pressure:</label>
-    <input type="text" id="trestbps" name="trestbps" placeholder="trestbps"> <br>
+    <input type="text" id="trestbps" name="trestbps" placeholder="trestbps"> 
 
     <label for="chol">Serum Cholesterol (mg/dl):</label>
-    <input type="text" id="chol" name="chol" placeholder="chol"> <br>
+    <input type="text" id="chol" name="chol" placeholder="chol"> 
 
     <label for="fbs">Fasting Blood Sugar > 120 mg/dl:</label>
     <select id="fbs" name="fbs">
         <option value="1">True</option>
         <option value="0">False</option>
-    </select> <br>
+    </select> 
 
     <label for="restecg">Resting Electrocardiographic Results:</label>
     <select id="restecg" name="restecg">
         <option value="0">Normal</option>
         <option value="1">Having ST-T wave abnormality</option>
         <option value="2">Showing probable or definite left ventricular hypertrophy</option>
-    </select> <br>
+    </select> 
 
     <label for="thalach">Maximum Heart Rate Achieved:</label>
-    <input type="text" id="thalach" name="thalach" placeholder="thalach"> <br>
+    <input type="text" id="thalach" name="thalach" placeholder="thalach"> 
 
     <label for="exang">Exercise-Induced Angina:</label>
     <select id="exang" name="exang">
         <option value="1">Yes</option>
         <option value="0">No</option>
-    </select> <br>
+    </select> 
 
     <label for="oldpeak">ST Depression Induced by Exercise relative to rest (oldpeak):</label>
-    <input type="text" id="oldpeak" name="oldpeak" placeholder="oldpeak"> <br>
+    <input type="text" id="oldpeak" name="oldpeak" placeholder="oldpeak"> 
 
     <label for="slope">Slope of the Peak Exercise ST Segment:</label>
     <select id="slope" name="slope">
         <option value="0">Upsloping</option>
         <option value="1">Flat</option>
         <option value="2">Downsloping</option>
-    </select> <br>
+    </select> 
 
     <label for="ca">Number of Major Vessels (0-3) colored by Flourosopy:</label>
-    <input type="text" id="ca" name="ca" placeholder="ca"> <br>
+    <input type="text" id="ca" name="ca" placeholder="ca"> 
 
     <label for="thal">Thalassemia:</label>
     <select id="thal" name="thal">
         <option value="1">Normal</option>
         <option value="2">Fixed Defect</option>
         <option value="3">Reversible Defect</option>
-    </select> <br>
+    </select> 
 
     <p><input type="submit" value="Check"/></p>
 </form>
