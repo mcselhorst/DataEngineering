@@ -6,16 +6,14 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, classification_report
-import matplotlib.pyplot as plt
-import seaborn as sns
 import tensorflow as tf
 import logging
 from flask import jsonify
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler
-from tensorflow.keras.regularizers import l2
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Dense, Dropout # type: ignore
+from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler # type: ignore
+from tensorflow.keras.regularizers import l2 # type: ignore
 
 def train(data):
     # Features and target
