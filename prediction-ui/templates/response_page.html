@@ -1,14 +1,65 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Likelihood of Heart Disease</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .result-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .positive {
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: #5cb85c;
+            font-weight: bold;
+        }
+
+    </style>
 </head>
 <body>
 
-{% if prediction_variable==true %}
-    <p>It is likely that you may have a heart disease.</p>
-{% else %}
-    <p>It is unlikely that you have a heart disease.</p>
-{% endif %}
+<div class="result-container">
+    <h1>Heart Disease Prediction Result</h1>
+
+    {% if prediction_variable == true %}
+        <p class="positive">It is likely that you may have a heart disease.</p>
+    {% else %}
+        <p class="negative">It is unlikely that you have a heart disease.</p>
+    {% endif %}
+</div>
+
 </body>
 </html>
+
 <!-- check https://flask.palletsprojects.com/en/2.3.x/tutorial/templates/ for information if needed -->
