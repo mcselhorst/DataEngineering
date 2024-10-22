@@ -3,7 +3,7 @@ import os
 import joblib  # Import joblib to load the scaler
 import pandas as pd
 from flask import jsonify
-from keras.models import load_model # type: ignore
+from keras.models import load_model 
 import logging
 from io import StringIO
 
@@ -24,8 +24,8 @@ class HeartDiseasePredictor:
                 logging.info("Model and scaler loaded successfully.")
             except KeyError:
                 logging.error("MODEL_REPO is undefined, loading from local.")
-                self.model = load_model('heart_disease_model.h5')
-                self.scaler = joblib.load('scaler.joblib')  # Load the scaler locally
+                self.model = load_model('prediction-api/heart_disease_model.h5')
+                self.scaler = joblib.load('prediction-api/scaler.joblib')  # Load the scaler locally
 
     def predict_single_record(self, prediction_input):
         self.load_model_and_scaler()  # Ensure model and scaler are loaded
