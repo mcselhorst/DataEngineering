@@ -1,65 +1,87 @@
 import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import confusion_matrix, classification_report
 import tensorflow as tf
+import joblib
 import logging
 from flask import jsonify
 
 from tensorflow.keras.models import Sequential # type: ignore
-from tensorflow.keras.layers import Dense, Dropout # type: ignore
-from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler # type: ignore
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization # type: ignore
+from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 from tensorflow.keras.regularizers import l2 # type: ignore
+from tensorflow.keras.optimizers import Adam # type: ignore
 
 def train(data):
     # Features and target
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1]
 
-    # Split the data into train (60%), validation (20%), and test (20%) sets
-    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, random_state=42)
-    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
+    # Split the data into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-    # Standardize the data
+    # Initialize StratifiedKFold for cross-validation on training data
+    kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+    # Collect results
+    accuracies = []
+
+    # Cross-validation loop on the training set
+    for train_index, val_index in kf.split(X_train, y_train):
+        X_fold_train, X_fold_val = X_train.iloc[train_index], X_train.iloc[val_index]
+        y_fold_train, y_fold_val = y_train.iloc[train_index], y_train.iloc[val_index]
+
+        # Standardize the data using training fold
+        scaler = StandardScaler()
+        X_fold_train_scaled = scaler.fit_transform(X_fold_train)
+        X_fold_val_scaled = scaler.transform(X_fold_val)
+
+        # Build the neural network model
+        model = Sequential()
+        model.add(Dense(128, input_dim=X_fold_train_scaled.shape[1], activation='relu', kernel_regularizer=l2(0.01)))
+        model.add(BatchNormalization())
+        model.add(Dropout(0.4))
+        model.add(Dense(64, activation='relu', kernel_regularizer=l2(0.01)))
+        model.add(BatchNormalization())
+        model.add(Dropout(0.4))
+        model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.01)))
+        model.add(Dense(1, activation='sigmoid'))  # Output layer for binary classification
+
+        # Compile the model
+        optimizer = Adam(learning_rate=0.001)
+        model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+
+        # Early stopping callback
+        early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+
+        # Train the model using validation data
+        history = model.fit(X_fold_train_scaled, y_fold_train,
+                            epochs=200,
+                            batch_size=16,
+                            validation_data=(X_fold_val_scaled, y_fold_val),
+                            callbacks=[early_stopping],
+                            verbose=1)
+
+        # Evaluate the model on validation set
+        val_loss, val_acc = model.evaluate(X_fold_val_scaled, y_fold_val, verbose=1)
+        accuracies.append(val_acc)
+
+    # Final evaluation on the test set
+    # Standardize the test set using the full training data scaler
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
-    X_val_scaled = scaler.transform(X_val)
     X_test_scaled = scaler.transform(X_test)
 
-    # Learning rate scheduler function
-    def lr_scheduler(epoch, lr):
-        if epoch > 10:
-            lr = lr * 0.9  # Reduce learning rate by 10% after 10 epochs
-        return lr
+    # Re-train the model on the entire training data
+    model.fit(X_train_scaled, y_train, epochs=200, batch_size=16, verbose=0)
 
-    # Build a neural network model
-    model = Sequential()
-    model.add(Dense(64, input_dim=X_train_scaled.shape[1], activation='relu', kernel_regularizer=l2(0.001)))  # L2 regularization
-    model.add(Dropout(0.3))  # Dropout layer to prevent overfitting
-    model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.001)))
-    model.add(Dropout(0.3))
-    model.add(Dense(1, activation='sigmoid'))  # Output layer for binary classification
+    # Evaluate the model on the test set
+    test_loss, test_acc = model.evaluate(X_test_scaled, y_test, verbose=0)
 
-    # Compile the model
-    model.compile(loss='binary_crossentropy',
-                  optimizer='adam',
-                  metrics=['accuracy'])
-
-    # Early stopping and learning rate scheduler callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
-    lr_scheduler_cb = LearningRateScheduler(lr_scheduler)
-
-    # Train the model using validation data
-    history = model.fit(X_train_scaled, y_train,
-                        epochs=100,
-                        batch_size=32,
-                        validation_data=(X_val_scaled, y_val),
-                        callbacks=[early_stopping, lr_scheduler_cb],
-                        verbose=1)
+    # Use the model to predict on the test set
+    y_pred = (model.predict(X_test_scaled) > 0.5).astype(int)
 
     # Save the model
     try:
@@ -85,7 +107,8 @@ def train(data):
     text_out = {
         "accuracy": test_acc,
         "loss": test_loss,
-    }
+        }
     logging.info(text_out)
     print(text_out)
-    return jsonify(text_out), 200
+
+    return jsonify(text_out), 200   

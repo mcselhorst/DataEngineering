@@ -1,32 +1,47 @@
 import json
 import os
-
+import joblib  # Import joblib to load the scaler
 import pandas as pd
 from flask import jsonify
-from keras.models import load_model
+from keras.models import load_model 
 import logging
 from io import StringIO
-
 
 class HeartDiseasePredictor:
     def __init__(self):
         self.model = None
+        self.scaler = None  # Add an attribute for the scaler
 
-    def predict_single_record(self, prediction_input):
-        logging.debug(prediction_input)
+    def load_model_and_scaler(self):
+        # Load the model and scaler if they are not already loaded
         if self.model is None:
             try:
                 model_repo = os.environ['MODEL_REPO']
-                file_path = os.path.join(model_repo, "heart_disease_model.h5")
-                self.model = load_model(file_path)
+                model_path = os.path.join(model_repo, "heart_disease_model.h5")
+                scaler_path = os.path.join(model_repo, "scaler.joblib")  # Path for the scaler
+                self.model = load_model(model_path)
+                self.scaler = joblib.load(scaler_path)  # Load the scaler
+                logging.info("Model and scaler loaded successfully.")
             except KeyError:
-                print("MODEL_REPO is undefined")
-                self.model = load_model('heart_disease_model.h5')
+                logging.error("MODEL_REPO is undefined, loading from local.")
+                self.model = load_model('prediction-api/heart_disease_model.h5')
+                self.scaler = joblib.load('prediction-api/scaler.joblib')  # Load the scaler locally
 
+    def predict_single_record(self, prediction_input):
+        self.load_model_and_scaler()  # Ensure model and scaler are loaded
+        logging.debug(prediction_input)
+
+        # Convert input JSON to DataFrame
         df = pd.read_json(StringIO(json.dumps(prediction_input)), orient='records')
-        y_pred = self.model.predict(df)
+
+        # Apply the StandardScaler to the input data
+        df_scaled = self.scaler.transform(df)
+
+        # Make predictions
+        y_pred = self.model.predict(df_scaled)
         logging.info(y_pred[0])
         status = (y_pred[0] > 0.5)
         logging.info(type(status[0]))
-        # return the prediction outcome as a json message. 200 is HTTP status code 200, indicating successful completion
+
+        # Return the prediction outcome as a JSON message
         return jsonify({'result': str(status[0])}), 200
