@@ -1,16 +1,15 @@
-# importing Flask and other modules
 import json
 import os
 import logging
 import requests
 from flask import Flask, request, render_template, jsonify
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Flask constructor
 app = Flask(__name__)
 
-
-# A decorator used to tell the application
-# which URL is associated function
 @app.route('/checkheartdisease', methods=["GET", "POST"])
 def check_heart_disease():
     if request.method == "GET":
@@ -37,25 +36,33 @@ def check_heart_disease():
 
         logging.debug("Prediction input : %s", prediction_input)
 
-        # use requests library to execute the prediction service API by sending an HTTP POST request
-        # use an environment variable to find the value of the diabetes prediction API
-        # json.dumps() function will convert a subset of Python objects into a json string.
-        # json.loads() method can be used to parse a valid JSON string and convert it into a Python Dictionary.
         predictor_api_url = os.environ['PREDICTOR_API']
-        res = requests.post(predictor_api_url, json=json.loads(json.dumps(prediction_input)))
+        logging.debug("Predictor API URL: %s", predictor_api_url)
 
-        prediction_value = res.json()['result']
-        logging.info("Prediction Output : %s", prediction_value)
-        return render_template("response_page.html",
-                               prediction_variable=prediction_value)
+        try:
+            res = requests.post(predictor_api_url, json=json.loads(json.dumps(prediction_input)))
+            logging.debug("Response object: %s", res)
+            logging.debug("Response text: %s", res.text)
+            logging.debug("Response JSON: %s", res.json())
+
+            prediction_value = res.json().get('result', 'No result found')
+            logging.info("Prediction Output : %s", prediction_value)
+
+            # Check for a test parameter to return JSON response
+            if request.args.get('test') == 'true':
+                return jsonify(prediction=prediction_value)
+
+            return render_template("response_page.html",
+                                   prediction_variable=prediction_value)
+        except requests.exceptions.RequestException as e:
+            logging.error("Error during prediction request: %s", e)
+            return jsonify(message="Error during prediction request"), 500
+        except ValueError as e:
+            logging.error("Error parsing JSON response: %s", e)
+            return jsonify(message="Error parsing JSON response"), 500
 
     else:
-        return jsonify(message="Method Not Allowed"), 405  # The 405 Method Not Allowed should be used to indicate
-    # that our app that does not allow the users to perform any other HTTP method (e.g., PUT and  DELETE) for
-    # '/checkdiabetes' path
+        return jsonify(message="Method Not Allowed"), 405
 
-
-# The code within this conditional block will only run the python file is executed as a
-# script. See https://realpython.com/if-name-main-python/
 if __name__ == '__main__':
     app.run(port=int(os.environ.get("PORT", 5000)), host='0.0.0.0', debug=True)
