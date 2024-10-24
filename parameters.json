@@ -1,0 +1,6 @@
+{
+  "project_id": "de2024-438710",
+  "data_bucket": "data_de_a1",
+  "trainset_filename": "training_set.csv",
+  "model_repo": "models_de2024"
+}
