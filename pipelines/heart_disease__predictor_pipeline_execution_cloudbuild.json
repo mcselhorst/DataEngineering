@@ -12,7 +12,7 @@
    {
        "name": "${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pipeline-executor:0.0.1",
        "args": [
-           "--name=diabetes-predictor-pipeline",           
+           "--name=heart-disease-predictor-pipeline",           
 		   "--pipeline_def=./pipelines/heart_disease_predictor_training_pipeline.yaml",
            "--pipeline_root=gs://${_TEMP_REPO}",         
 		   "--parameter_dict=./parameters.json"
